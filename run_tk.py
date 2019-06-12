@@ -1,117 +1,191 @@
 import tkinter as tk
+from tkinter import ttk, messagebox
+import configparser
+import requests
+# 服务器信息
+# url = ['http://192.168.0.145:9998', 'http://api.singmap.com']
+# # none_url = 'http://api.singmap.com'
+# img_url = ''
 
-'''松耦合'''
+# # 接口路径
+# login = '/broke-manager-service/sysuser/login'
+# queryProject = '/broke-manager-service/project/queryProject'
+# querySitePlan = '/broke-manager-service/siteplan/querySitePlan'
+# updateSiteContent = '/broke-manager-service/siteplan/updateSiteContent'
+
+# #用户信息
+# user_name = ''
+# user_token = ''
+# user_email = ''
+# user_password = ''
+# user_Id = ''
+# brokeId = ''
+# projectId = ''
+# sitePlanId = ''
+# '''松耦合'''
+
+pd = R'E:\新联国际\地产项目\自动画图\HUATU\config.ini'
+RD = configparser.ConfigParser()
+RD.read(pd, encoding='utf-8')
+fp = open(pd, 'w',encoding='utf-8')
+# print(RD.get('DATABASE', 'database'))
+RD.set('USER', 'user_name', 'CCC')
+RD.write(fp)
+fp.close()
+
+def rd_cf():
+    pass
+
+def set_http(name,value):
+    RD.set('HTTP',name,value)
+    RD.write(fp)
+    fp.close()
+
+def set_user(name,value):
+    RD.set('USER',name,value)
+    with open(pd, 'w', encoding='utf-8') as file:
+        RD.write(file)  # 数据写入配置文件
+
 
 # 弹窗
 class MyDialog(tk.Toplevel):
     def __init__(self):
         super().__init__()
-        self.title('设置用户信息')
-        self.geometry('450x450')
-        # 弹窗界面
+        self.title('登录')
+        # self.geometry('450x450')
+        # self.none_url = none_url
         self.setup_UI()
-        
-        
+
     def setup_UI(self):
-        # 第一行（两列）
+        # def go(*args):  #处理事件，*args表示可变参数
+        #     self.none_url = comboxlist.get()
+
+        # 工作环境输入框
+        row4 = tk.Frame(self)
+        row4.pack(fill="x")
+        tk.Label(row4, text='账户：', width=8).pack(side=tk.LEFT)
+        self.environment = tk.StringVar(value=RD.get('HTTP', 'url1'))
+        tk.Entry(
+            row4, textvariable=self.environment, width=20).pack(side=tk.LEFT)
+
+        # 用户名输入框
         row1 = tk.Frame(self)
         row1.pack(fill="x")
-        tk.Label(row1, text='姓名：', width=8).pack(side=tk.LEFT)
-        self.name = tk.StringVar()
+        tk.Label(row1, text='账户：', width=8).pack(side=tk.LEFT)
+        self.name = tk.StringVar(value='ccc@mixgo.com')
         tk.Entry(row1, textvariable=self.name, width=20).pack(side=tk.LEFT)
-        
-        # 第二行
+
+        # 密码输入框
         row2 = tk.Frame(self)
         row2.pack(fill="x", ipadx=1, ipady=1)
-        tk.Label(row2, text='年龄：', width=8).pack(side=tk.LEFT)
-        self.age = tk.IntVar()
-        tk.Entry(row2, textvariable=self.age, width=20).pack(side=tk.LEFT)
-        
-        # 第三行
+        tk.Label(row2, text='密码：', width=8).pack(side=tk.LEFT)
+        self.password = tk.IntVar(value='123456')
+        tk.Entry(
+            row2, textvariable=self.password, show="*",
+            width=20).pack(side=tk.LEFT)
+
+        # 登录按钮
         row3 = tk.Frame(self)
-        # row3.place(x=100,y=100)
         row3.pack(fill="x")
-        tk.Button(row3, text="取消",width=20, command=self.cancel).pack(side=tk.BOTTOM)
-        tk.Button(row3, text="确定",width=20, command=self.ok).pack(side=tk.BOTTOM)
-        
+        tk.Button(
+            row3, text="登录", width=20,
+            command=self.logins).pack(side=tk.BOTTOM)
 
-    def ok(self):
-        self.userinfo = [self.name.get(), self.age.get()] # 设置数据
-        self.destroy() # 销毁窗口
-        
-    def cancel(self):
-        self.userinfo = None # 空！
-        self.destroy()
+        # 登录提示
+        row5 = tk.Frame(self)
+        self.var1 = tk.StringVar()
+        row5.pack(fill="x", ipadx=1, ipady=1)
+        tk.Label(
+            row5, fg='red', textvariable=self.var1,
+            width=20).pack(side=tk.LEFT)
 
-        
+    def logins(self):
 
+        data = {
+            'userId': '',
+            'token': '',
+            'brokeId': '',
+            'email': self.name.get(),
+            'password': self.password.get()
+        }
+        print(RD.get('HTTP', 'url1'))
+        self.user_all = requests.post(
+            self.environment.get() + RD.get('HTTP', 'login'),
+            data=data).json()
+        
+        if self.user_all.get('code') == '0':
+            RD['USER'] = self.user_all['datas']
+            RD['HTTP']['img_url'] = self.user_all['url']
+            RD['HTTP']['none_url'] = self.environment.get()
+            with open(pd, 'w', encoding='utf-8') as file:
+                RD.write(file)  # 数据写入配置文件
+            
+            messagebox.showinfo('登录成功', self.user_all['msg'])
+            self.destroy()  # 销毁窗口
+        else:
+            self.var1.set('账户或密码错误！！')
 
 
 # 主窗
 class MyApp(tk.Tk):
-    
     def __init__(self):
         super().__init__()
         #self.pack() # 若继承 tk.Frame ，此句必须有！
-        self.title('用户信息')
-        self.geometry('450x450')
-        # 程序参数/数据
-        self.name = '张三'
-        self.age = 30
-        
-        # 程序界面
+        self.title('自动画图工具')
+        self.geometry('1362x794')
         self.setupUI()
 
-    
     def setupUI(self):
         row3 = tk.Frame(self)
         row3.pack(fill="x")
-        tk.Button(row3, text="登录", command=self.setup_config).pack(side=tk.RIGHT)
+        tk.Button(
+            row3, text="登录", width=20,
+            command=self.setup_config).pack(side=tk.LEFT)
+        tk.Label(row3, text='用户：', width=8).pack(side=tk.LEFT)
+        self.user_names = tk.IntVar(value=RD.get('USER', 'username'))
+        tk.Label(
+            row3, textvariable=self.user_names, width=10).pack(side=tk.LEFT)
 
-        # 第一行（两列）
+
+        #选择项目
         row1 = tk.Frame(self)
         row1.pack(fill="x")
-        tk.Label(row1, text='姓名：', width=8).pack(side=tk.LEFT)
-        self.l1 = tk.Label(row1, text=self.name, width=20)
-        self.l1.pack(side=tk.LEFT)
-        
-        # 第二行
-        row2 = tk.Frame(self)
-        row2.pack(fill="x")
-        tk.Label(row2, text='年龄：', width=8).pack(side=tk.LEFT)
-        self.l2 = tk.Label(row2, text=self.age, width=20)
-        self.l2.pack(side=tk.LEFT)
-        
-        # 第三行
-        row3 = tk.Frame(self)
-        row3.pack(fill="x")
-        tk.Button(row3, text="设置", command=self.setup_config).pack(side=tk.RIGHT)
-        
-        
-    # 设置参数
+        tk.Label(row1, text='选择项目：', width=8).pack(side=tk.LEFT)
+        self.name = tk.StringVar()
+        players = ttk.Combobox(row1, textvariable=self.name)
+        players["values"] = ('未获取到项目')
+        # players["state"] = "readonly"
+        players.current(0)
+        players.pack(side=tk.LEFT)
+
+
     def setup_config(self):
         # 接收弹窗的数据
         res = self.ask_userinfo()
-        #print(res)
-        if res is None: return
-        
-        # 更改参数
-        self.name, self.age = res
-        
-        # 更新界面
-        self.l1.config(text=self.name)
-        self.l2.config(text=self.age)
-    
-    
+        # print(res)
+        # if res is None: return
+        self.user_names.set(RD.get('USER', 'username'))
+        print(res.user_all.get('code'))
+        if res.user_all.get('code') == '0' :
+            print(RD.get('USER', 'userid'))
+            data= {
+                'userId': RD.get('USER', 'userid'),
+                'token': RD.get('USER', 'token'),
+                'brokeId': RD.get('USER', 'brokeid'),
+                'pageSize': 50,
+                'pageNo': 1,
+                'projectName': ''
+            }
+            self.project_list = requests.get(RD.get('HTTP','none_url')+RD.get('HTTP','queryproject'),params = data).json()
+            print(self.project_list)
+            
     # 弹窗
     def ask_userinfo(self):
         inputDialog = MyDialog()
-    
-        self.wait_window(inputDialog) # 这一句很重要！！！
-        
-        return inputDialog.userinfo
-        
-        
+        self.wait_window(inputDialog)  # 这一句很重要！！！
+        return inputDialog
+
+
 if __name__ == '__main__':
     app = MyApp()
     app.mainloop()
