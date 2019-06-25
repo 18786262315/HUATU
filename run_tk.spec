@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['run_tk.py'],
-             pathex=['e:\\新联国际\\地产项目\\自动画图\\HUATU'],
+             pathex=['E:\\新联国际\\地产项目\\自动画图\\HUATU'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -26,4 +26,4 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           runtime_tmpdir=None,
-          console=False )
+          console=False , icon='003.ico')
