@@ -28,7 +28,7 @@ class MyDialog(tk.Toplevel):
         label = tk.Label(self,image=self.photo,bg='#AFEEEE')
         label.pack()
         # self.attributes("-toolwindow", 1)
-        self.wm_attributes("-topmost", 1)
+        # self.wm_attributes("-topmost", 1)
         # 工作环境输入框
         
         row4 = tk.Frame(self,bg='#AFEEEE')
@@ -104,8 +104,8 @@ class Project(tk.Toplevel):
         self.setup_UI()
 
     def setup_UI(self):
-        self.attributes("-toolwindow", 1)
-        self.wm_attributes("-topmost", 1)
+        # self.attributes("-toolwindow", 1)
+        # self.wm_attributes("-topmost", 1)
         # 搜索
         row1 = tk.Frame(self)
         row1.pack(fill="x")
@@ -177,8 +177,8 @@ class BuildDing(tk.Toplevel):
         self.setupUI()
 
     def setupUI(self):
-        self.attributes("-toolwindow", 1)
-        self.wm_attributes("-topmost", 1)
+        # self.attributes("-toolwindow", 1)
+        # self.wm_attributes("-topmost", 1)
         row1 = tk.Frame(self)
         row1.pack(fill="x")
         tk.Button(
@@ -263,8 +263,8 @@ class Photo(tk.Toplevel):
 
         img_pwd = RD.get('HTTP', 'img_pwd')
         # print(os.path.isfile(img_pwd))
-        self.attributes("-toolwindow", 1)
-        self.wm_attributes("-topmost", 1)
+        # self.attributes("-toolwindow", 1)
+        # self.wm_attributes("-topmost", 1)
         row1 = tk.Frame(self)
         row1.pack(fill='x')
         self.img = Image.open(img_pwd)
